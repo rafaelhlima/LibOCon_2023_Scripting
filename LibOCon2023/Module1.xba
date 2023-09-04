@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="Module1" script:language="StarBasic" script:moduleType="normal">REM  *****  BASIC  *****
+
+Option Explicit
+
+Sub GetFolders
+	Dim fs as Object, sMessage As String
+	fs = CreateScriptService(&quot;FileSystem&quot;)
+	&apos; Use native OS file naming notation
+	fs.FileNaming = &quot;SYS&quot;
+	sMessage = &quot;Instalation folder: &quot; &amp; fs.InstallFolder &amp; CHR$(13) &amp; _
+			   &quot;Home folder: &quot; &amp; fs.HomeFolder
+	MsgBox sMessage
+End Sub
+
+Sub CreateCalcDoc
+	Dim sDocPath As String, svcUI As Object, oDoc As Object
+	sDocPath = &quot;file:///home/rafael/Documents/newdoc.ods&quot;
+	svcUI = CreateScriptService(&quot;UI&quot;)
+	oDoc = svcUI.CreateDocument(DocumentType := &quot;Calc&quot;, Hidden := True)
+	oDoc.SetValue(&quot;A1&quot;, &quot;Hello&quot;)
+	oDoc.SaveAs(sDocPath, Overwrite := True)
+	oDoc.CloseDocument()
+End Sub
+
+Sub OpenCalcDoc
+	Dim sDocPath As String, svcUI As Object, oDoc As Object
+	sDocPath = &quot;file:///home/rafael/Documents/mydoc.ods&quot;
+	svcUI = CreateScriptService(&quot;UI&quot;)
+	oDoc = svcUI.OpenDocument(sDocPath)
+	svcUI.Maximize(sDocPath)
+	MsgBox &quot;This is a &quot; &amp; oDoc.DocumentType &amp; &quot; file&quot;
+End Sub
+
+Sub RequiresSF
+	If Not GlobalScope.BasicLibraries.IsLibraryLoaded(&quot;ScriptForge&quot;) Then
+		GlobalScope.BasicLibraries.LoadLibrary(&quot;ScriptForge&quot;)
+	End If
+End Sub
+
+Sub ListOpenDocs
+	RequiresSF
+	Dim svcUI As Object, arrDocs As Object
+	svcUI = CreateScriptService(&quot;UI&quot;)
+	&apos; Array with the list of open documents
+	arrDocs = svcUI.Documents
+	&apos; Concatenate the names in the array
+	Dim sOpenDocs As String
+	sOpenDocs = Join(arrDocs, CHR$(13))
+	MsgBox sOpenDocs
+End Sub
+
+Sub CopyPasteExample
+	&apos; Instantiate the dispatcher
+	Dim oFrame As Object, oDispatcher As Object
+	oFrame = ThisComponent.CurrentController.Frame
+	oDispatcher = CreateUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	&apos; Moves to cell A1
+	Dim args1(0) As New com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;ToPoint&quot;
+	args1(0).Value = &quot;$A$1&quot;
+	oDispatcher.executeDispatch(oFrame, &quot;.uno:GoToCell&quot;, &quot;&quot;, , args1())
+	&apos; Copy its contents (equivalent to Edit - Copy)
+	oDispatcher.executeDispatch(oFrame, &quot;.uno:Copy&quot;, &quot;&quot;, , Array())
+	&apos; Moves to cell A2
+	args1(0).Value = &quot;$A$2&quot;
+	oDispatcher.executeDispatch(oFrame, &quot;.uno:GoToCell&quot;, &quot;&quot;, , args1())
+	&apos; Paste contentx (equivalent to Edit - Paste)
+	oDispatcher.executeDispatch(oFrame, &quot;.uno:Paste&quot;, &quot;&quot;, , Array())
+End Sub
+
+Sub DispatcherExample
+	Dim oFrame As Object, oDispatcher As Object
+	oFrame = ThisComponent.CurrentController.Frame
+	oDispatcher = CreateUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	&apos; Dispatch the .uno:Save command (equivalent to File - Save)
+	oDispatcher.executeDispatch(oFrame, &quot;.uno:Save&quot;, &quot;&quot;, , Array())
+End Sub
+
+
+Sub SpellCheckerExample
+	Dim oSpellChecker As Object, bReturn As Boolean
+	Dim aLocale As New com.sun.star.lang.Locale
+	aLocale.Language = &quot;en&quot;
+	aLocale.Country = &quot;US&quot;
+	&apos; Create an instance of the SpellChecker service
+	oSpellChecker = CreateUnoService(&quot;com.sun.star.linguistic2.SpellChecker&quot;)
+	&apos; Use the service to test if a word is valid
+	Dim sWord As String
+	sWord = InputBox(&quot;Type a word&quot;)
+	bReturn = oSpellChecker.isValid(sWord, aLocale, Array())
+	If bReturn Then
+		MsgBox &quot;The word &apos;&quot; &amp; sWord &amp; &quot;&apos; is spelled correctly&quot;
+	Else
+		MsgBox &quot;The word &apos;&quot; &amp; sWord &amp; &quot;&apos; is not spelled correctly&quot;
+	End If
+End Sub
+
+Sub SayHelloWriter
+	Dim sName As String
+	sName = InputBox(&quot;What is your name?&quot;)
+	Dim oDoc As Object, oText As Object
+	oDoc = StarDesktop.loadComponentFromUrl(&quot;private:factory/swriter&quot;, _
+	                                        &quot;_blank&quot;, 0, Array())
+	oText = oDoc.getText()
+	oText.insertString(oText.End, &quot;Hello &quot; &amp; sName &amp; CHR$(10), False)
+End Sub
+
+Sub BtnCreateDistrTable
+	&apos; Check if we are in a Calc document
+	If Not ThisComponent.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		Exit Sub
+	End If
+	&apos; Call both sub routines
+	CreateStdDistrTable
+	FormatRange
+End Sub
+
+Sub FormatRange
+	Dim oRange As Object
+	&apos; Format header
+	oRange = ThisComponent.Sheets(0).getCellRangeByName(&quot;A1:B1&quot;)
+	oRange.CellBackColor = RGB(200, 200, 200)
+	oRange.CharWeight = com.sun.star.awt.FontWeight.BOLD
+	&apos;Format the entire table
+	oRange = ThisComponent.Sheets(0).getCellRangeByName(&quot;A1:B14&quot;)
+	oRange.CharFontName = &quot;Arial&quot;
+	&apos; Align contents at the center
+	Dim eAlign : eAlign = com.sun.star.table.CellHoriJustify
+	oRange.HoriJustify = eAlign.CENTER
+	&apos; Create a border format object
+	Dim lineFormat As New com.sun.star.table.BorderLine2
+	lineFormat.LineStyle = com.sun.star.table.BorderLineStyle.SOLID
+	lineFormat.LineWidth = 10
+	&apos; Set borders around all cells
+	oRange.TopBorder = lineFormat
+	oRange.BottomBorder = lineFormat
+	oRange.LeftBorder = lineFormat
+	oRange.RightBorder = lineFormat
+End Sub
+
+Sub CreateStdDistrTable
+	Dim oSheet As Object, oRange As Object, oCell As Object
+	oSheet = ThisComponent.Sheets(0)
+	oRange = oSheet.getCellRangeByName(&quot;A1:B1&quot;)
+	oRange.setDataArray(Array(Array(&quot;z-Value&quot;, &quot;P(Z&lt;z)&quot;)))
+	Dim zValue As Double, nRow As Integer, sAddress As String
+	nRow = 1
+	For zValue = -3 To 3 Step 0.5
+		oCell = oSheet.getCellByPosition(0, nRow)
+		sAddress = oCell.AbsoluteName
+		oCell.setValue(zValue)
+		oCell = oSheet.getCellByPosition(1, nRow)
+		oCell.setFormula(&quot;=NORM.S.DIST(&quot; &amp; sAddress &amp; &quot;;1)&quot;)
+		nRow = nRow + 1
+	Next zValue
+End Sub
+
+Sub SayHelloCalc
+	Dim sName As String
+	sName = InputBox(&quot;What is your name?&quot;)
+	Dim oCell As Object
+	oCell = ThisComponent.Sheets(0).getCellRangeByName(&quot;A1&quot;)
+	oCell.SetString(&quot;Hello &quot; &amp; sName)
+End Sub
+
+Sub SayHello
+	Dim sName As String
+	sName = InputBox(&quot;What is your name?&quot;)
+	If sName &lt;&gt; &quot;&quot; Then
+		MsgBox &quot;Hello &quot; &amp; sName
+	Else
+		MsgBox &quot;Why no name? Are you shy?&quot;
+	End If
+End Sub
+
+</script:module>
