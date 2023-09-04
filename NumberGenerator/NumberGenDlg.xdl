@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="NumberGen" dlg:left="227" dlg:top="108" dlg:width="139" dlg:height="122" dlg:closeable="true" dlg:moveable="true" dlg:title="Normal Distribution">
+ <dlg:bulletinboard>
+  <dlg:text dlg:id="Label1" dlg:tab-index="0" dlg:left="9" dlg:top="9" dlg:width="42" dlg:height="10" dlg:value="Start cell"/>
+  <dlg:text dlg:id="Label2" dlg:tab-index="1" dlg:left="9" dlg:top="26" dlg:width="42" dlg:height="10" dlg:value="Num Columns"/>
+  <dlg:textfield dlg:id="editStartCell" dlg:tab-index="2" dlg:left="58" dlg:top="8" dlg:width="74" dlg:height="13" dlg:value="A1"/>
+  <dlg:textfield dlg:id="editNumColumns" dlg:tab-index="3" dlg:left="58" dlg:top="24" dlg:width="74" dlg:height="13" dlg:value="1"/>
+  <dlg:text dlg:id="Label3" dlg:tab-index="4" dlg:left="9" dlg:top="43" dlg:width="42" dlg:height="10" dlg:value="Num Rows"/>
+  <dlg:text dlg:id="Label4" dlg:tab-index="6" dlg:left="9" dlg:top="58" dlg:width="42" dlg:height="10" dlg:value="Mean"/>
+  <dlg:text dlg:id="Label5" dlg:tab-index="8" dlg:left="9" dlg:top="73" dlg:width="42" dlg:height="10" dlg:value="Std Deviation"/>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="10" dlg:left="5" dlg:top="95" dlg:width="62" dlg:height="20" dlg:value="Generate">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:numbergen.py$btn_generate_click?language=Python&amp;location=user" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="11" dlg:left="71" dlg:top="95" dlg:width="62" dlg:height="20" dlg:value="Cancel">
+   <script:event script:event-name="on-mousedown" script:macro-name="vnd.sun.star.script:numbergen.py$btn_cancel_click?language=Python&amp;location=user" script:language="Script"/>
+  </dlg:button>
+  <dlg:textfield dlg:id="editNumRows" dlg:tab-index="5" dlg:left="58" dlg:top="40" dlg:width="74" dlg:height="13" dlg:value="1"/>
+  <dlg:textfield dlg:id="editMean" dlg:tab-index="7" dlg:left="58" dlg:top="56" dlg:width="74" dlg:height="13" dlg:value="0"/>
+  <dlg:textfield dlg:id="editStdDev" dlg:tab-index="9" dlg:left="58" dlg:top="72" dlg:width="74" dlg:height="13" dlg:value="1"/>
+ </dlg:bulletinboard>
+</dlg:window>
